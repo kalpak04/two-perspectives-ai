@@ -1,1 +1,6 @@
-// Flows will be imported for their side effects in this file.
+import { config } from 'dotenv';
+config();
+
+import '@/ai/flows/general-advice.ts';
+import '@/ai/flows/dual-perspective-generation.ts';
+import '@/ai/flows/voice-to-text-input.ts';
