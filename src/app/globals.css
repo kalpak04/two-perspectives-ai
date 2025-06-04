@@ -3,9 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'Alumni Sans SC', Arial, Helvetica, sans-serif;
-}
+/* Removed explicit body font-family to let Tailwind config take precedence */
 
 @layer base {
   :root {
