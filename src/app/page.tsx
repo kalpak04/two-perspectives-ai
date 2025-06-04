@@ -1,5 +1,5 @@
 
-import { DualInsightsForm } from '@/components/dual-insights-form'; // Will rename this component in a future step if needed
+import { DualInsightsForm } from '@/components/dual-insights-form'; 
 import { Sparkles } from 'lucide-react'; 
 
 export default function Home() {
@@ -9,10 +9,20 @@ export default function Home() {
         <div className="inline-flex items-center justify-center p-3 mb-4 rounded-full bg-primary/20">
             <Sparkles className="h-12 w-12 text-primary" strokeWidth={1.5} />
         </div>
-        <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">
+        <h1 className="text-4xl md:text-6xl font-headline font-bold text-primary 
+                       tracking-wider
+                       style={{
+                         textShadow: `
+                           1px 1px 0px hsl(var(--muted)),
+                           2px 2px 0px hsl(var(--muted)),
+                           3px 3px 0px hsl(var(--muted)),
+                           4px 4px 0px hsl(var(--muted)),
+                           1px 1px 2px rgba(0,0,0,0.5)
+                         `,
+                       }}">
           Two Perspectives
         </h1>
-        <p className="mt-2 text-lg text-foreground/80">
+        <p className="mt-4 text-lg text-foreground/80">
           Explore your dilemmas with a Gentle Coach and a No-BS Coach.
         </p>
       </header>
