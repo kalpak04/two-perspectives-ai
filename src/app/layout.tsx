@@ -1,5 +1,6 @@
 
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { Toaster } from "@/components/ui/toaster";
 import { InteractiveBackground } from '@/components/interactive-background';
 import './globals.css';
@@ -22,6 +23,17 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=WDXL+Lubrifont+TC&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col">
+        <div className="fixed inset-0 -z-20">
+          <Image
+            src="https://placehold.co/1920x1080.png"
+            alt="Abstract background representing two perspectives"
+            layout="fill"
+            objectFit="cover"
+            quality={75}
+            data-ai-hint="abstract duality"
+            priority
+          />
+        </div>
         <InteractiveBackground />
         {children}
         <Toaster />
