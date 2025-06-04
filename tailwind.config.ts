@@ -11,8 +11,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Spectral', 'serif'],
-        headline: ['Spectral', 'serif'],
+        body: ['"WDXL Lubrifont TC"', 'serif'],
+        headline: ['"WDXL Lubrifont TC"', 'serif'],
         code: ['monospace'],
       },
       colors: {
