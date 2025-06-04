@@ -1,4 +1,3 @@
-
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { Toaster } from "@/components/ui/toaster";
@@ -27,8 +26,10 @@ export default function RootLayout({
           <Image
             src="https://miro.medium.com/v2/resize:fit:1400/0*79VfKUZRMHTQdbd5"
             alt="Abstract background representing two perspectives"
-            layout="fill"
-            objectFit="cover"
+            fill
+            style={{
+              objectFit: 'cover'
+            }}
             quality={75}
             priority
           />

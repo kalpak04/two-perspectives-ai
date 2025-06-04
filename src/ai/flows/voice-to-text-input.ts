@@ -61,10 +61,14 @@ async (input) => {
 
 const dualPerspectivePrompt = ai.definePrompt({
   name: 'dualPerspectivePrompt',
-  input: z.object({
-    transcription: z.string().describe('The transcription of the user audio.'),
-  }),
-  output: VoiceToTextInputOutputSchema,
+  input: {
+    schema: z.object({
+      transcription: z.string().describe('The transcription of the user audio.'),
+    }),
+  },
+  output: {
+    schema: VoiceToTextInputOutputSchema,
+  },
   prompt: `You are a dual coach, providing two distinct perspectives on user dilemmas.  The transcription of the user\'s audio is: {{{transcription}}}.  Provide two perspectives:
 
 1.  Gentle Coach: Empathetic, supportive guidance. Validates feelings, offers micro-steps, and is compassionate.

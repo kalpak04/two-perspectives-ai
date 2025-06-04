@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -53,11 +52,14 @@ export function DualInsightsForm() {
     setOriginalDilemma("");
   };
   
-  const handleInputModeChange = (mode: "text" | "voice") => {
-    setActiveInputMode(mode);
-    resetToInputMode();
-     if (isRecording) {
-      stopRecording(false); // Pass false as we don't want to process audio
+  const handleInputModeChange = (mode: string) => {
+    const validMode = mode as "text" | "voice";
+    if (validMode === "text" || validMode === "voice") {
+      setActiveInputMode(validMode);
+      resetToInputMode();
+      if (isRecording) {
+        stopRecording(false); // Pass false as we don't want to process audio
+      }
     }
   };
 
@@ -118,12 +120,12 @@ export function DualInsightsForm() {
           audioChunksRef.current.push(event.data);
         };
 
-        mediaRecorderRef.current.onstop = async (event) => {
+        mediaRecorderRef.current.onstop = async () => {
           // Check if stop was triggered by mode change or actual recording end
           // The 'event' here is a BlobEvent if stopped by MediaRecorder.stop() itself
           // but might be different if stopRecording was called manually without processing.
           // We rely on a flag or parameter to stopRecording if we shouldn't process.
-          if (mediaRecorderRef.current && (mediaRecorderRef.current as any).shouldProcess !== false) {
+          if (mediaRecorderRef.current && (mediaRecorderRef.current as MediaRecorder & { shouldProcess?: boolean }).shouldProcess !== false) {
             const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
             const reader = new FileReader();
             reader.readAsDataURL(audioBlob);
@@ -166,11 +168,11 @@ export function DualInsightsForm() {
           }
            // Clean up the custom flag
           if (mediaRecorderRef.current) {
-            delete (mediaRecorderRef.current as any).shouldProcess;
+            delete (mediaRecorderRef.current as MediaRecorder & { shouldProcess?: boolean }).shouldProcess;
           }
         };
 
-        (mediaRecorderRef.current as any).shouldProcess = true; // Custom flag to control processing in onstop
+        (mediaRecorderRef.current as MediaRecorder & { shouldProcess?: boolean }).shouldProcess = true; // Custom flag to control processing in onstop
         mediaRecorderRef.current.start();
         setIsRecording(true);
         setRecordingTime(0);
@@ -204,7 +206,7 @@ export function DualInsightsForm() {
 
   const stopRecording = useCallback((processAudio = true) => {
     if (mediaRecorderRef.current && isRecording) {
-      (mediaRecorderRef.current as any).shouldProcess = processAudio; // Set flag before stopping
+      (mediaRecorderRef.current as MediaRecorder & { shouldProcess?: boolean }).shouldProcess = processAudio; // Set flag before stopping
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       if (recordingIntervalRef.current) {
@@ -301,7 +303,7 @@ export function DualInsightsForm() {
                   <AlertTitle className="font-headline text-accent">Voice Input</AlertTitle>
                   <AlertDescription>
                     Click the record button to share your dilemma (up to 30 seconds).
-                    We'll transcribe it and provide perspectives.
+                    We&apos;ll transcribe it and provide perspectives.
                   </AlertDescription>
                 </Alert>
               )}
@@ -343,7 +345,7 @@ export function DualInsightsForm() {
         <div className="space-y-6">
           <h2 className="text-2xl font-headline text-primary text-center">Choose a Perspective to Explore</h2>
           <p className="text-center text-muted-foreground mb-6">
-            You shared: "{originalDilemma.length > 100 ? originalDilemma.substring(0, 100) + "..." : originalDilemma}"
+            You shared: &quot;{originalDilemma.length > 100 ? originalDilemma.substring(0, 100) + "..." : originalDilemma}&quot;
           </p>
           <div className="grid md:grid-cols-2 gap-6">
             <Card
