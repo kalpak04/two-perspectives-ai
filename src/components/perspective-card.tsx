@@ -33,10 +33,10 @@ export const PerspectiveCard: FC<PerspectiveCardProps> = ({ title, advice, onRat
       {!isLoading && advice && (
         <CardFooter className="flex justify-end space-x-2">
           <Button variant="ghost" size="icon" onClick={() => onRate("up")} aria-label="Rate up">
-            <ThumbsUp className="h-5 w-5 text-green-500" />
+            <ThumbsUp className="h-5 w-5 text-primary" />
           </Button>
           <Button variant="ghost" size="icon" onClick={() => onRate("down")} aria-label="Rate down">
-            <ThumbsDown className="h-5 w-5 text-red-500" />
+            <ThumbsDown className="h-5 w-5 text-destructive" />
           </Button>
         </CardFooter>
       )}
