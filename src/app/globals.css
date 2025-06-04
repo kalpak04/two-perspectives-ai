@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -53,6 +54,8 @@ body {
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 0 0% 80%;
     --sidebar-ring: 0 0% 15%;
+
+    --interactive-bg-spotlight: hsla(0, 0%, 90%, 0.15); /* Subtle lighter gray for light mode */
   }
 
   .dark {
@@ -99,6 +102,8 @@ body {
     --sidebar-accent-foreground: 0 0% 7%;
     --sidebar-border: 0 0% 30%;
     --sidebar-ring: 0 0% 85%;
+
+    --interactive-bg-spotlight: hsla(0, 0%, 15%, 0.25); /* Subtle darker gray for dark mode */
   }
 }
 
