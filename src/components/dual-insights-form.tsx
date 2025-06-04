@@ -303,7 +303,7 @@ export function DualInsightsForm() {
                   <AlertTitle className="font-headline text-accent">Voice Input</AlertTitle>
                   <AlertDescription>
                     Click the record button to share your dilemma (up to 30 seconds).
-                    We&apos;ll transcribe it and provide perspectives.
+                    We&apos;ll transcribe it and provide perspectives for you.
                   </AlertDescription>
                 </Alert>
               )}
