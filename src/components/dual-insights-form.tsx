@@ -1,22 +1,25 @@
-// src/components/dual-insights-form.tsx
+
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mic, Send, StopCircle, Loader2, AlertCircle, Info } from 'lucide-react';
+import { Mic, Send, StopCircle, Loader2, AlertCircle, Info, MessageSquareHeart, MessageSquareWarning, ArrowLeft } from 'lucide-react';
 import { generalAdvice, GeneralAdviceOutput } from '@/ai/flows/general-advice';
 import { voiceToTextInput, VoiceToTextInputOutput } from '@/ai/flows/voice-to-text-input';
 import { PerspectiveCard } from './perspective-card';
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const MAX_TEXT_LENGTH = 500;
 const MAX_VOICE_DURATION_MS = 30000; // 30 seconds
 
-type Advice = {
+type ViewMode = "input" | "personaSelection" | "chatView";
+type SelectedPersona = "gentle" | "no-bs" | null;
+type InitialAdvice = {
   gentleCoachAdvice: string;
   noBsCoachAdvice: string;
 } | null;
@@ -24,9 +27,14 @@ type Advice = {
 export function DualInsightsForm() {
   const [userInput, setUserInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [advice, setAdvice] = useState<Advice>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeInputMode, setActiveInputMode] = useState<"text" | "voice">("text");
+
+  const [viewMode, setViewMode] = useState<ViewMode>("input");
+  const [initialAdvice, setInitialAdvice] = useState<InitialAdvice>(null);
+  const [selectedPersonaForChat, setSelectedPersonaForChat] = useState<SelectedPersona>(null);
+  const [originalDilemma, setOriginalDilemma] = useState<string>("");
+
 
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -36,6 +44,42 @@ export function DualInsightsForm() {
 
   const { toast } = useToast();
 
+  const resetToInputMode = () => {
+    setUserInput("");
+    setViewMode("input");
+    setInitialAdvice(null);
+    setSelectedPersonaForChat(null);
+    setError(null);
+    setOriginalDilemma("");
+  };
+  
+  const handleInputModeChange = (mode: "text" | "voice") => {
+    setActiveInputMode(mode);
+    resetToInputMode();
+     if (isRecording) {
+      stopRecording(false); // Pass false as we don't want to process audio
+    }
+  };
+
+  const processApiResponse = (result: GeneralAdviceOutput | VoiceToTextInputOutput, dilemma: string) => {
+    if ('gentleCoachAdvice' in result && 'noBsCoachAdvice' in result) { // GeneralAdviceOutput
+        setInitialAdvice({
+            gentleCoachAdvice: result.gentleCoachAdvice,
+            noBsCoachAdvice: result.noBsCoachAdvice,
+        });
+    } else if ('gentleCoachPerspective' in result && 'noBSCoachPerspective' in result) { // VoiceToTextInputOutput
+        setInitialAdvice({
+            gentleCoachAdvice: result.gentleCoachPerspective,
+            noBsCoachAdvice: result.noBSCoachPerspective,
+        });
+    } else {
+        throw new Error("Unknown API response structure");
+    }
+    setOriginalDilemma(dilemma);
+    setViewMode("personaSelection");
+  };
+
+
   const handleTextSubmit = async () => {
     if (!userInput.trim()) {
       setError("Please enter your dilemma.");
@@ -43,19 +87,21 @@ export function DualInsightsForm() {
     }
     setIsGenerating(true);
     setError(null);
-    setAdvice(null);
+    setInitialAdvice(null); 
+    setSelectedPersonaForChat(null);
 
     try {
       const result: GeneralAdviceOutput = await generalAdvice({ dilemma: userInput });
-      setAdvice(result);
+      processApiResponse(result, userInput);
     } catch (e) {
       console.error("Error generating advice:", e);
-      setError("Failed to generate advice. Please try again.");
+      setError("Failed to generate perspectives. Please try again.");
       toast({
         title: "Error",
-        description: "Could not generate advice. Check console for details.",
+        description: "Could not generate perspectives. Check console for details.",
         variant: "destructive",
       });
+      setViewMode("input");
     } finally {
       setIsGenerating(false);
     }
@@ -72,55 +118,72 @@ export function DualInsightsForm() {
           audioChunksRef.current.push(event.data);
         };
 
-        mediaRecorderRef.current.onstop = async () => {
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-          // Convert Blob to base64 data URI
-          const reader = new FileReader();
-          reader.readAsDataURL(audioBlob);
-          reader.onloadend = async () => {
-            const base64Audio = reader.result as string;
-            if (!base64Audio) {
-              setError("Failed to process audio. Please try again.");
+        mediaRecorderRef.current.onstop = async (event) => {
+          // Check if stop was triggered by mode change or actual recording end
+          // The 'event' here is a BlobEvent if stopped by MediaRecorder.stop() itself
+          // but might be different if stopRecording was called manually without processing.
+          // We rely on a flag or parameter to stopRecording if we shouldn't process.
+          if (mediaRecorderRef.current && (mediaRecorderRef.current as any).shouldProcess !== false) {
+            const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+            const reader = new FileReader();
+            reader.readAsDataURL(audioBlob);
+            reader.onloadend = async () => {
+              const base64Audio = reader.result as string;
+              if (!base64Audio) {
+                setError("Failed to process audio. Please try again.");
+                setIsGenerating(false);
+                setViewMode("input");
+                return;
+              }
+              
+              try {
+                // For voice, we'll use a placeholder dilemma text for now.
+                // In a real scenario, the voice input itself would be transcribed first.
+                // For this structure, we assume voiceToTextInput flow handles transcription and then perspective generation.
+                const result: VoiceToTextInputOutput = await voiceToTextInput({ audioDataUri: base64Audio });
+                processApiResponse(result, "Voice input (transcription will be part of AI's context)");
+              } catch (e) {
+                console.error("Error with voice input:", e);
+                setError("Failed to process voice input. Please try again.");
+                 toast({
+                  title: "Voice Input Error",
+                  description: "Could not process your voice input.",
+                  variant: "destructive",
+                });
+                setViewMode("input");
+              } finally {
+                setIsGenerating(false);
+              }
+            };
+             reader.onerror = () => {
+              setError("Failed to read audio data.");
               setIsGenerating(false);
-              return;
-            }
-            
-            try {
-              const result: VoiceToTextInputOutput = await voiceToTextInput({ audioDataUri: base64Audio });
-              setAdvice({
-                gentleCoachAdvice: result.gentleCoachPerspective,
-                noBsCoachAdvice: result.noBSCoachPerspective,
-              });
-            } catch (e) {
-              console.error("Error with voice input:", e);
-              setError("Failed to process voice input. Please try again.");
-               toast({
-                title: "Voice Input Error",
-                description: "Could not process your voice input.",
-                variant: "destructive",
-              });
-            } finally {
-              setIsGenerating(false);
-            }
-          };
-           reader.onerror = () => {
-            setError("Failed to read audio data.");
+              setViewMode("input");
+            };
+          } else {
+             // If shouldProcess is false, just reset UI state without AI call
             setIsGenerating(false);
-          };
+          }
+           // Clean up the custom flag
+          if (mediaRecorderRef.current) {
+            delete (mediaRecorderRef.current as any).shouldProcess;
+          }
         };
 
+        (mediaRecorderRef.current as any).shouldProcess = true; // Custom flag to control processing in onstop
         mediaRecorderRef.current.start();
         setIsRecording(true);
         setRecordingTime(0);
         setError(null);
-        setAdvice(null); 
-        setIsGenerating(true); // Show loading while recording and processing
+        setInitialAdvice(null); 
+        setSelectedPersonaForChat(null);
+        setIsGenerating(true); 
 
         recordingIntervalRef.current = setInterval(() => {
           setRecordingTime((prevTime) => {
             const newTime = prevTime + 100;
             if (newTime >= MAX_VOICE_DURATION_MS) {
-              stopRecording();
+              stopRecording(); // This will call mediaRecorderRef.current.stop()
             }
             return newTime;
           });
@@ -130,40 +193,44 @@ export function DualInsightsForm() {
         console.error("Error accessing microphone:", err);
         setError("Microphone access denied. Please allow microphone access in your browser settings.");
         setIsGenerating(false);
+        setViewMode("input");
       }
     } else {
       setError("Audio recording is not supported by your browser.");
       setIsGenerating(false);
+      setViewMode("input");
     }
   };
 
-  const stopRecording = useCallback(() => {
+  const stopRecording = useCallback((processAudio = true) => {
     if (mediaRecorderRef.current && isRecording) {
+      (mediaRecorderRef.current as any).shouldProcess = processAudio; // Set flag before stopping
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
       }
-      // Note: Actual AI call happens in onstop handler after blob processing.
-      // setIsGenerating(false) will be handled by the onstop handler logic.
+      // If not processing audio (e.g. mode switch), set isGenerating to false immediately
+      if (!processAudio) {
+        setIsGenerating(false);
+      }
     }
   }, [isRecording]);
 
-  // Cleanup recording on unmount or mode change
   useEffect(() => {
     return () => {
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-        mediaRecorderRef.current.stop();
+        stopRecording(false);
       }
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
       }
     };
-  }, []);
+  }, [stopRecording]);
 
   useEffect(() => {
     if (activeInputMode === 'text' && isRecording) {
-      stopRecording();
+      stopRecording(false);
     }
   }, [activeInputMode, isRecording, stopRecording]);
 
@@ -174,7 +241,11 @@ export function DualInsightsForm() {
       title: "Feedback Received",
       description: `You rated ${perspective} as ${rating === "up" ? "Helpful" : "Not Helpful"}.`,
     });
-    // In a real app, send this to a backend.
+  };
+
+  const handlePersonaSelect = (persona: SelectedPersona) => {
+    setSelectedPersonaForChat(persona);
+    setViewMode("chatView");
   };
 
   const charCount = userInput.length;
@@ -182,100 +253,159 @@ export function DualInsightsForm() {
 
   return (
     <div className="w-full max-w-2xl mx-auto p-4 md:p-6 space-y-6">
-      <Tabs value={activeInputMode} onValueChange={(value) => setActiveInputMode(value as "text" | "voice")} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-primary/10">
-          <TabsTrigger value="text" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Text Input</TabsTrigger>
-          <TabsTrigger value="voice" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Voice Input</TabsTrigger>
-        </TabsList>
-      </Tabs>
-
-      {activeInputMode === "text" && (
-        <div className="space-y-4">
-          <Textarea
-            placeholder="Tell us about your dilemma... (e.g., I'm feeling overwhelmed with work, or Should I change my career?)"
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            rows={5}
-            maxLength={MAX_TEXT_LENGTH}
-            className="focus:ring-accent focus:border-accent text-base"
-            disabled={isGenerating}
-          />
-          <div className="text-sm text-muted-foreground text-right">
-            {remainingChars >=0 ? `${remainingChars} characters remaining` : <span className="text-destructive">Character limit exceeded</span>}
-          </div>
-          <Button onClick={handleTextSubmit} disabled={isGenerating || !userInput.trim() || remainingChars < 0} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-            {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-            Get Perspectives
-          </Button>
-        </div>
-      )}
-
-      {activeInputMode === "voice" && (
-        <div className="space-y-4 text-center">
-          {!isRecording && !isGenerating && (
-             <Alert className="text-left border-accent/50">
-              <Info className="h-4 w-4 text-accent" />
-              <AlertTitle className="font-headline text-accent">Voice Input</AlertTitle>
-              <AlertDescription>
-                Click the record button to share your dilemma (up to 30 seconds).
-                We'll transcribe it and provide perspectives.
-              </AlertDescription>
-            </Alert>
-          )}
-          {isRecording && (
-            <div className="my-4">
-              <p className="text-lg font-medium text-primary">Recording...</p>
-              <Progress value={(recordingTime / MAX_VOICE_DURATION_MS) * 100} className="w-full h-2 mt-2 [&>div]:bg-accent" />
-              <p className="text-sm text-muted-foreground mt-1">{(recordingTime / 1000).toFixed(1)}s / {(MAX_VOICE_DURATION_MS / 1000)}s</p>
-            </div>
-          )}
-           {isGenerating && !isRecording && (
-            <div className="my-4 flex flex-col items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-accent" />
-              <p className="mt-2 text-muted-foreground">Processing your voice...</p>
-            </div>
-          )}
-          <Button
-            onClick={isRecording ? stopRecording : startRecording}
-            disabled={isGenerating && !isRecording}
-            className={`w-full ${isRecording ? 'bg-destructive hover:bg-destructive/90' : 'bg-accent hover:bg-accent/90'} text-accent-foreground`}
-          >
-            {isRecording ? <StopCircle className="mr-2 h-5 w-5" /> : <Mic className="mr-2 h-5 w-5" />}
-            {isRecording ? "Stop Recording" : (isGenerating ? "Processing..." : "Start Recording")}
-          </Button>
-        </div>
+      {viewMode !== "chatView" && (
+        <Tabs value={activeInputMode} onValueChange={handleInputModeChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 bg-primary/10">
+            <TabsTrigger value="text" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Text Input</TabsTrigger>
+            <TabsTrigger value="voice" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Voice Input</TabsTrigger>
+          </TabsList>
+        </Tabs>
       )}
 
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="my-4">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <div className="space-y-6 mt-8">
-        {isGenerating && !advice && activeInputMode === 'text' && (
-          <>
+      {viewMode === "input" && (
+        <>
+          {activeInputMode === "text" && (
+            <div className="space-y-4">
+              <Textarea
+                placeholder="Tell us about your dilemma... (e.g., I'm feeling overwhelmed with work, or Should I change my career?)"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                rows={5}
+                maxLength={MAX_TEXT_LENGTH}
+                className="focus:ring-accent focus:border-accent text-base"
+                disabled={isGenerating}
+              />
+              <div className="text-sm text-muted-foreground text-right">
+                {remainingChars >=0 ? `${remainingChars} characters remaining` : <span className="text-destructive">Character limit exceeded</span>}
+              </div>
+              <Button onClick={handleTextSubmit} disabled={isGenerating || !userInput.trim() || remainingChars < 0} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
+                {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+                Get Perspectives
+              </Button>
+            </div>
+          )}
+
+          {activeInputMode === "voice" && (
+            <div className="space-y-4 text-center">
+              {!isRecording && !isGenerating && (
+                 <Alert className="text-left border-accent/50">
+                  <Info className="h-4 w-4 text-accent" />
+                  <AlertTitle className="font-headline text-accent">Voice Input</AlertTitle>
+                  <AlertDescription>
+                    Click the record button to share your dilemma (up to 30 seconds).
+                    We'll transcribe it and provide perspectives.
+                  </AlertDescription>
+                </Alert>
+              )}
+              {isRecording && (
+                <div className="my-4">
+                  <p className="text-lg font-medium text-primary">Recording...</p>
+                  <Progress value={(recordingTime / MAX_VOICE_DURATION_MS) * 100} className="w-full h-2 mt-2 [&>div]:bg-accent" />
+                  <p className="text-sm text-muted-foreground mt-1">{(recordingTime / 1000).toFixed(1)}s / {(MAX_VOICE_DURATION_MS / 1000)}s</p>
+                </div>
+              )}
+               {isGenerating && !isRecording && viewMode === 'input' && (
+                <div className="my-4 flex flex-col items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                  <p className="mt-2 text-muted-foreground">Processing your voice...</p>
+                </div>
+              )}
+              <Button
+                onClick={isRecording ? () => stopRecording() : startRecording}
+                disabled={isGenerating && !isRecording}
+                className={`w-full ${isRecording ? 'bg-destructive hover:bg-destructive/90' : 'bg-accent hover:bg-accent/90'} text-accent-foreground`}
+              >
+                {isRecording ? <StopCircle className="mr-2 h-5 w-5" /> : <Mic className="mr-2 h-5 w-5" />}
+                {isRecording ? "Stop Recording" : (isGenerating && viewMode === 'input' ? "Processing..." : "Start Recording")}
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+      
+      {isGenerating && viewMode === 'input' && activeInputMode === 'text' && (
+         <div className="space-y-6 mt-8">
             <PerspectiveCard title="Gentle Coach" advice="" isLoading={true} onRate={() => {}} />
             <PerspectiveCard title="No-BS Coach" advice="" isLoading={true} onRate={() => {}} />
-          </>
-        )}
-        {advice && (
-          <>
+        </div>
+      )}
+
+
+      {viewMode === "personaSelection" && initialAdvice && (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-headline text-primary text-center">Choose a Perspective to Explore</h2>
+          <p className="text-center text-muted-foreground mb-6">
+            You shared: "{originalDilemma.length > 100 ? originalDilemma.substring(0, 100) + "..." : originalDilemma}"
+          </p>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card
+              onClick={() => handlePersonaSelect("gentle")}
+              className="cursor-pointer hover:shadow-xl transition-shadow duration-300 ease-in-out border-2 border-transparent hover:border-primary"
+            >
+              <CardHeader className="items-center">
+                <MessageSquareHeart className="h-12 w-12 text-primary mb-2" />
+                <CardTitle className="font-headline text-2xl text-primary">Gentle Coach</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-center">
+                  Empathetic, supportive guidance. Validates feelings and suggests small, manageable steps.
+                </CardDescription>
+              </CardContent>
+            </Card>
+            <Card
+              onClick={() => handlePersonaSelect("no-bs")}
+              className="cursor-pointer hover:shadow-xl transition-shadow duration-300 ease-in-out border-2 border-transparent hover:border-primary"
+            >
+              <CardHeader className="items-center">
+                <MessageSquareWarning className="h-12 w-12 text-primary mb-2" />
+                <CardTitle className="font-headline text-2xl text-primary">No-BS Coach</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-center">
+                  Direct, actionable advice. Identifies cognitive traps and gives blunt, actionable strategies.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </div>
+           <Button variant="outline" onClick={resetToInputMode} className="w-full mt-6">
+            Ask Something Else
+          </Button>
+        </div>
+      )}
+
+      {viewMode === "chatView" && initialAdvice && selectedPersonaForChat && (
+        <div className="space-y-6">
+          <Button variant="outline" onClick={() => setViewMode("personaSelection")} className="mb-4">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Perspectives
+          </Button>
+          {selectedPersonaForChat === "gentle" && (
             <PerspectiveCard
               title="Gentle Coach"
-              advice={advice.gentleCoachAdvice}
+              advice={initialAdvice.gentleCoachAdvice}
               onRate={(rating) => handleRate("Gentle Coach", rating)}
             />
+          )}
+          {selectedPersonaForChat === "no-bs" && (
             <PerspectiveCard
               title="No-BS Coach"
-              advice={advice.noBsCoachAdvice}
+              advice={initialAdvice.noBsCoachAdvice}
               onRate={(rating) => handleRate("No-BS Coach", rating)}
             />
-          </>
-        )}
-      </div>
+          )}
+          {/* Placeholder for future chat input */}
+          <div className="mt-6 p-4 border-t border-border">
+            <p className="text-center text-muted-foreground">Chat with the {selectedPersonaForChat === "gentle" ? "Gentle" : "No-BS"} Coach coming soon!</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import { DualInsightsForm } from '@/components/dual-insights-form';
+
+import { DualInsightsForm } from '@/components/dual-insights-form'; // Will rename this component in a future step if needed
 import { Sparkles } from 'lucide-react'; 
 
 export default function Home() {
@@ -9,15 +10,15 @@ export default function Home() {
             <Sparkles className="h-12 w-12 text-primary" strokeWidth={1.5} />
         </div>
         <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">
-          Dual Insights
+          Two Perspectives
         </h1>
         <p className="mt-2 text-lg text-foreground/80">
-          Navigate life's dilemmas with two unique perspectives.
+          Explore your dilemmas with a Gentle Coach and a No-BS Coach.
         </p>
       </header>
       <DualInsightsForm />
       <footer className="mt-12 text-center text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} Dual Insights. Powered by AI.</p>
+        <p>&copy; {new Date().getFullYear()} Two Perspectives. Powered by AI.</p>
         <p className="mt-1">Remember: AI advice is for reflection, not a substitute for professional help.</p>
       </footer>
     </main>

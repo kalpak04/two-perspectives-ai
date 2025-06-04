@@ -5,8 +5,8 @@ import { InteractiveBackground } from '@/components/interactive-background';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Dual Insights',
-  description: 'Get two perspectives on your dilemmas: Gentle Coach & No-BS Coach.',
+  title: 'Two Perspectives',
+  description: 'Explore dilemmas with two AI coaches: Gentle and No-BS.',
 };
 
 export default function RootLayout({
