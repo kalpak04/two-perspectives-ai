@@ -10,7 +10,7 @@ body {
 @layer base {
   :root {
     /* Black & White Light Theme */
-    --background: 0 0% 100%; /* White */
+    --background: 0 0% 85%; /* Darker Light Gray */
     --foreground: 0 0% 7%; /* Dark Gray / Near Black */
 
     --card: 0 0% 98%; /* Off-White */
@@ -55,7 +55,7 @@ body {
     --sidebar-border: 0 0% 80%;
     --sidebar-ring: 0 0% 15%;
 
-    --interactive-bg-spotlight: hsla(0, 0%, 80%, 0.3); /* Increased opacity */
+    --interactive-bg-spotlight: hsla(0, 0%, 95%, 0.4); /* Lighter spot on darker BG */
   }
 
   .dark {
