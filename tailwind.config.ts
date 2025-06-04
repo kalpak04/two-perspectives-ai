@@ -11,8 +11,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Manrope', 'sans-serif'],
-        headline: ['Manrope', 'sans-serif'],
+        body: ['Spectral', 'serif'],
+        headline: ['Spectral', 'serif'],
         code: ['monospace'],
       },
       colors: {
