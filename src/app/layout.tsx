@@ -25,12 +25,11 @@ export default function RootLayout({
       <body className="font-body antialiased min-h-screen flex flex-col">
         <div className="fixed inset-0 -z-20">
           <Image
-            src="https://placehold.co/1920x1080.png"
+            src="https://miro.medium.com/v2/resize:fit:1400/0*79VfKUZRMHTQdbd5"
             alt="Abstract background representing two perspectives"
             layout="fill"
             objectFit="cover"
             quality={75}
-            data-ai-hint="abstract duality"
             priority
           />
         </div>
