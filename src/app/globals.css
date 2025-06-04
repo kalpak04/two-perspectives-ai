@@ -9,24 +9,24 @@ body {
 
 @layer base {
   :root {
-    /* Refined Black & Red Theme (Light mode version - effectively same as dark) */
+    /* Refined Black & Red Theme (Light mode version - effectively same as dark for consistency) */
     --background: 0 0% 0%; /* Black */
-    --foreground: 0 80% 50%; /* Deeper Red for general text */
+    --foreground: 0 0% 90%; /* Light Grey/Off-White for general text */
 
     --card: 0 0% 5%; /* Very Dark Grey */
-    --card-foreground: 0 80% 50%; /* Deeper Red */
+    --card-foreground: 0 80% 50%; /* Deeper Red (for text within cards, if specific) */
 
     --popover: 0 0% 5%; /* Very Dark Grey */
-    --popover-foreground: 0 80% 50%; /* Deeper Red */
+    --popover-foreground: 0 80% 50%; /* Deeper Red (for text within popovers, if specific) */
 
-    --primary: 0 80% 55%; /* Brighter Red for primary actions/titles */
+    --primary: 0 80% 55%; /* Brighter Red for primary actions/titles/headings */
     --primary-foreground: 0 0% 98%; /* Off-White (for text on red buttons) */
 
     --secondary: 0 0% 20%; /* Dark Grey */
     --secondary-foreground: 0 0% 90%; /* Light Grey/Off-White */
 
     --muted: 0 0% 10%; /* Darker Grey */
-    --muted-foreground: 0 0% 60%; /* Medium Grey */
+    --muted-foreground: 0 0% 60%; /* Medium Grey (for placeholder text, etc.) */
 
     --accent: 0 80% 55%; /* Brighter Red (same as primary) */
     --accent-foreground: 0 0% 98%; /* Off-White */
@@ -35,8 +35,8 @@ body {
     --destructive-foreground: 0 0% 98%; /* Off-White */
 
     --border: 0 0% 15%; /* Dark Grey Border */
-    --input: 0 0% 7%; /* Very Dark Grey Input */
-    --ring: 0 80% 60%; /* Brightest Red Ring */
+    --input: 0 0% 7%; /* Very Dark Grey Input Background */
+    --ring: 0 80% 60%; /* Brightest Red Ring for focus */
     
     --chart-1: 0 80% 60%;
     --chart-2: 0 80% 55%;
@@ -54,13 +54,13 @@ body {
     --sidebar-border: 0 0% 12%;
     --sidebar-ring: 0 80% 60%;
 
-    --interactive-bg-spotlight: hsla(0, 0%, 60%, 0.15); /* Greyish spotlight for black bg */
+    --interactive-bg-spotlight: hsla(0, 0%, 60%, 0.25); /* Greyish spotlight for black bg, increased visibility */
   }
 
   .dark {
     /* Refined Black & Red Theme (Dark mode version - mirrors light for consistency) */
     --background: 0 0% 0%; /* Black */
-    --foreground: 0 80% 50%; /* Deeper Red for general text */
+    --foreground: 0 0% 90%; /* Light Grey/Off-White for general text */
 
     --card: 0 0% 5%; /* Very Dark Grey */
     --card-foreground: 0 80% 50%; /* Deeper Red */
@@ -68,7 +68,7 @@ body {
     --popover: 0 0% 5%; /* Very Dark Grey */
     --popover-foreground: 0 80% 50%; /* Deeper Red */
 
-    --primary: 0 80% 55%; /* Brighter Red for primary actions/titles */
+    --primary: 0 80% 55%; /* Brighter Red for primary actions/titles/headings */
     --primary-foreground: 0 0% 98%; /* Off-White */
 
     --secondary: 0 0% 20%; /* Dark Grey */
@@ -84,7 +84,7 @@ body {
     --destructive-foreground: 0 0% 98%; /* Off-White */
 
     --border: 0 0% 15%; /* Dark Grey Border */
-    --input: 0 0% 7%; /* Very Dark Grey Input */
+    --input: 0 0% 7%; /* Very Dark Grey Input Background */
     --ring: 0 80% 60%; /* Brightest Red Ring */
     
     --chart-1: 0 80% 60%;
@@ -102,7 +102,7 @@ body {
     --sidebar-border: 0 0% 12%;
     --sidebar-ring: 0 80% 60%;
 
-    --interactive-bg-spotlight: hsla(0, 0%, 60%, 0.15); /* Greyish spotlight for black bg */
+    --interactive-bg-spotlight: hsla(0, 0%, 60%, 0.25); /* Greyish spotlight for black bg, increased visibility */
   }
 }
 
@@ -111,6 +111,6 @@ body {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground; /* Default text color is now --foreground */
   }
 }
