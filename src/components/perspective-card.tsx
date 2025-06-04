@@ -15,7 +15,7 @@ interface PerspectiveCardProps {
 
 export const PerspectiveCard: FC<PerspectiveCardProps> = ({ title, advice, onRate, isLoading = false }) => {
   return (
-    <Card className="w-full shadow-lg">
+    <Card className="w-full shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
       <CardHeader>
         <CardTitle className="font-headline text-xl text-primary">{title}</CardTitle>
       </CardHeader>

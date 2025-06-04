@@ -348,28 +348,28 @@ export function DualInsightsForm() {
           <div className="grid md:grid-cols-2 gap-6">
             <Card
               onClick={() => handlePersonaSelect("gentle")}
-              className="cursor-pointer hover:shadow-xl transition-shadow duration-300 ease-in-out border-2 border-transparent hover:border-primary"
+              className="cursor-pointer hover:shadow-xl transition-all duration-300 ease-in-out border-2 border-transparent hover:border-primary hover:-translate-y-1"
             >
               <CardHeader className="items-center">
                 <MessageSquareHeart className="h-12 w-12 text-primary mb-2" />
                 <CardTitle className="font-headline text-2xl text-primary">Gentle Coach</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-center">
+                <CardDescription className="text-center text-foreground/80">
                   Empathetic, supportive guidance. Validates feelings and suggests small, manageable steps.
                 </CardDescription>
               </CardContent>
             </Card>
             <Card
               onClick={() => handlePersonaSelect("no-bs")}
-              className="cursor-pointer hover:shadow-xl transition-shadow duration-300 ease-in-out border-2 border-transparent hover:border-primary"
+              className="cursor-pointer hover:shadow-xl transition-all duration-300 ease-in-out border-2 border-transparent hover:border-primary hover:-translate-y-1"
             >
               <CardHeader className="items-center">
                 <MessageSquareWarning className="h-12 w-12 text-primary mb-2" />
                 <CardTitle className="font-headline text-2xl text-primary">No-BS Coach</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-center">
+                <CardDescription className="text-center text-foreground/80">
                   Direct, actionable advice. Identifies cognitive traps and gives blunt, actionable strategies.
                 </CardDescription>
               </CardContent>
