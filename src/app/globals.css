@@ -8,7 +8,7 @@
 @layer base {
   :root {
     /* Refined Black & Red Theme (Light mode version - effectively same as dark for consistency) */
-    --background: 0 0% 0%; /* Black */
+    --background: 0 0% 4%; /* Very Dark Grey (Almost Black) */
     --foreground: 0 0% 90%; /* Light Grey/Off-White for general text */
 
     --card: 0 0% 5%; /* Very Dark Grey */
@@ -57,7 +57,7 @@
 
   .dark {
     /* Refined Black & Red Theme (Dark mode version - mirrors light for consistency) */
-    --background: 0 0% 0%; /* Black */
+    --background: 0 0% 4%; /* Very Dark Grey (Almost Black) */
     --foreground: 0 0% 90%; /* Light Grey/Off-White for general text */
 
     --card: 0 0% 5%; /* Very Dark Grey */
