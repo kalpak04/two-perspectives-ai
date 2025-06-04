@@ -64,6 +64,11 @@ export function DualInsightsForm() {
   };
 
   const processApiResponse = (result: GeneralAdviceOutput | VoiceToTextInputOutput, dilemma: string) => {
+    // Check if result exists and is an object
+    if (!result || typeof result !== 'object') {
+      throw new Error("Invalid API response: result is not an object");
+    }
+
     if ('gentleCoachAdvice' in result && 'noBsCoachAdvice' in result) { // GeneralAdviceOutput
         setInitialAdvice({
             gentleCoachAdvice: result.gentleCoachAdvice,
@@ -75,7 +80,8 @@ export function DualInsightsForm() {
             noBsCoachAdvice: result.noBSCoachPerspective,
         });
     } else {
-        throw new Error("Unknown API response structure");
+        console.error("Unexpected API response structure:", result);
+        throw new Error(`Unknown API response structure. Expected properties not found. Received: ${JSON.stringify(result)}`);
     }
     setOriginalDilemma(dilemma);
     setViewMode("personaSelection");
@@ -94,6 +100,12 @@ export function DualInsightsForm() {
 
     try {
       const result: GeneralAdviceOutput = await generalAdvice({ dilemma: userInput });
+      
+      // Add additional validation
+      if (!result) {
+        throw new Error("No response received from AI service");
+      }
+      
       processApiResponse(result, userInput);
     } catch (e) {
       console.error("Error generating advice:", e);
