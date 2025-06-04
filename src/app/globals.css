@@ -55,7 +55,7 @@ body {
     --sidebar-border: 0 0% 80%;
     --sidebar-ring: 0 0% 15%;
 
-    --interactive-bg-spotlight: hsla(0, 0%, 90%, 0.15); /* Subtle lighter gray for light mode */
+    --interactive-bg-spotlight: hsla(0, 0%, 80%, 0.3); /* Increased opacity */
   }
 
   .dark {
@@ -103,7 +103,7 @@ body {
     --sidebar-border: 0 0% 30%;
     --sidebar-ring: 0 0% 85%;
 
-    --interactive-bg-spotlight: hsla(0, 0%, 15%, 0.25); /* Subtle darker gray for dark mode */
+    --interactive-bg-spotlight: hsla(0, 0%, 25%, 0.4); /* Increased opacity */
   }
 }
 
