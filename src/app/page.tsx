@@ -10,16 +10,7 @@ export default function Home() {
             <Sparkles className="h-12 w-12 text-primary" strokeWidth={1.5} />
         </div>
         <h1 className="text-4xl md:text-6xl font-headline font-bold text-primary 
-                       tracking-wider
-                       style={{
-                         textShadow: `
-                           1px 1px 0px hsl(var(--muted)),
-                           2px 2px 0px hsl(var(--muted)),
-                           3px 3px 0px hsl(var(--muted)),
-                           4px 4px 0px hsl(var(--muted)),
-                           1px 1px 2px rgba(0,0,0,0.5)
-                         `,
-                       }}">
+                       tracking-wider">
           Two Perspectives
         </h1>
         <p className="mt-4 text-lg text-foreground/80">
@@ -34,3 +25,4 @@ export default function Home() {
     </main>
   );
 }
+
