@@ -25,6 +25,8 @@ type InitialAdvice = {
   noBsCoachAdvice: string;
 } | null;
 
+type ChatRole = 'user' | 'coach';
+
 export function DualInsightsForm() {
   const [userInput, setUserInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -46,7 +48,7 @@ export function DualInsightsForm() {
   const { toast } = useToast();
 
   // Chat state for the selected coach
-  const [chatMessages, setChatMessages] = useState<{ sender: 'user' | 'coach', text: string }[]>([]);
+  const [chatMessages, setChatMessages] = useState<{ sender: ChatRole, text: string }[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [isCoachResponding, setIsCoachResponding] = useState(false);
 
@@ -265,27 +267,27 @@ export function DualInsightsForm() {
   // Simulate coach response (replace with real API call as needed)
   const handleSendChat = async () => {
     if (!chatInput.trim()) return;
-    const userMessage = { sender: 'user' as const, text: chatInput };
+    const userMessage = { sender: 'user' as ChatRole, text: chatInput };
     setChatMessages((msgs) => [...msgs, userMessage]);
     setIsCoachResponding(true);
     setChatInput("");
     try {
       const aiInput = {
         messages: [
-          ...chatMessages.map(m => ({ role: m.sender, content: m.text })),
-          { role: 'user', content: chatInput }
+          ...chatMessages.map(m => ({ role: m.sender as ChatRole, content: m.text })),
+          { role: 'user' as ChatRole, content: chatInput }
         ],
         persona: selectedPersonaForChat as 'gentle' | 'no-bs',
       };
       const result = await coachChat(aiInput);
       setChatMessages((msgs) => [
         ...msgs,
-        { sender: 'coach', text: result.response }
+        { sender: 'coach' as ChatRole, text: result.response }
       ]);
     } catch (e) {
       setChatMessages((msgs) => [
         ...msgs,
-        { sender: 'coach', text: 'Sorry, there was an error. Please try again.' }
+        { sender: 'coach' as ChatRole, text: 'Sorry, there was an error. Please try again.' }
       ]);
     } finally {
       setIsCoachResponding(false);
@@ -454,12 +456,21 @@ export function DualInsightsForm() {
               <div className="mt-6 bg-background/80 rounded-xl shadow-lg p-4 border border-border max-w-xl mx-auto">
                 <div className="mb-4 max-h-60 overflow-y-auto space-y-2">
                   {chatMessages.map((msg, idx) => (
-                    <div key={idx} className={msg.sender === 'user' ? 'text-right' : 'text-left'}>
-                      <span className={
-                        msg.sender === 'user'
-                          ? 'inline-block bg-primary/10 text-primary px-3 py-2 rounded-2xl mb-1'
-                          : 'inline-block bg-accent/10 text-accent px-3 py-2 rounded-2xl mb-1'
-                      }>
+                    <div
+                      key={idx}
+                      className={msg.sender === 'user' ? 'text-right' : 'text-left'}
+                    >
+                      <span
+                        className={
+                          (msg.sender === 'user'
+                            ? 'inline-block bg-primary/10 text-primary'
+                            : 'inline-block bg-accent/10 text-accent') +
+                          ' px-3 py-2 rounded-2xl mb-1 transition-all duration-300 ease-in-out animate-fadein'
+                        }
+                        style={{
+                          willChange: 'transform, opacity',
+                        }}
+                      >
                         {msg.text}
                       </span>
                     </div>
@@ -502,12 +513,21 @@ export function DualInsightsForm() {
               <div className="mt-6 bg-background/80 rounded-xl shadow-lg p-4 border border-border max-w-xl mx-auto">
                 <div className="mb-4 max-h-60 overflow-y-auto space-y-2">
                   {chatMessages.map((msg, idx) => (
-                    <div key={idx} className={msg.sender === 'user' ? 'text-right' : 'text-left'}>
-                      <span className={
-                        msg.sender === 'user'
-                          ? 'inline-block bg-primary/10 text-primary px-3 py-2 rounded-2xl mb-1'
-                          : 'inline-block bg-accent/10 text-accent px-3 py-2 rounded-2xl mb-1'
-                      }>
+                    <div
+                      key={idx}
+                      className={msg.sender === 'user' ? 'text-right' : 'text-left'}
+                    >
+                      <span
+                        className={
+                          (msg.sender === 'user'
+                            ? 'inline-block bg-primary/10 text-primary'
+                            : 'inline-block bg-accent/10 text-accent') +
+                          ' px-3 py-2 rounded-2xl mb-1 transition-all duration-300 ease-in-out animate-fadein'
+                        }
+                        style={{
+                          willChange: 'transform, opacity',
+                        }}
+                      >
                         {msg.text}
                       </span>
                     </div>
