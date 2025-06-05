@@ -1,4 +1,3 @@
-
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -11,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['"WDXL Lubrifont TC"', 'serif'],
-        headline: ['"WDXL Lubrifont TC"', 'serif'],
+        body: ['"Edu NSW ACT Cursive"', 'cursive'],
+        headline: ['"Edu NSW ACT Cursive"', 'cursive'],
         code: ['monospace'],
       },
       colors: {
