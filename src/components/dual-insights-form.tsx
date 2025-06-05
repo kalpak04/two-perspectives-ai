@@ -12,6 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { coachChat } from '@/ai/flows/coach-chat';
 
 const MAX_TEXT_LENGTH = 500;
 const MAX_VOICE_DURATION_MS = 30000; // 30 seconds
@@ -42,6 +44,11 @@ export function DualInsightsForm() {
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const { toast } = useToast();
+
+  // Chat state for the selected coach
+  const [chatMessages, setChatMessages] = useState<{ sender: 'user' | 'coach', text: string }[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [isCoachResponding, setIsCoachResponding] = useState(false);
 
   const resetToInputMode = () => {
     setUserInput("");
@@ -248,6 +255,42 @@ export function DualInsightsForm() {
     }
   }, [activeInputMode, isRecording, stopRecording]);
 
+  // Reset chat state when switching persona or resetting
+  useEffect(() => {
+    setChatMessages([]);
+    setChatInput("");
+    setIsCoachResponding(false);
+  }, [selectedPersonaForChat, viewMode]);
+
+  // Simulate coach response (replace with real API call as needed)
+  const handleSendChat = async () => {
+    if (!chatInput.trim()) return;
+    const userMessage = { sender: 'user' as const, text: chatInput };
+    setChatMessages((msgs) => [...msgs, userMessage]);
+    setIsCoachResponding(true);
+    setChatInput("");
+    try {
+      const aiInput = {
+        messages: [
+          ...chatMessages.map(m => ({ role: m.sender, content: m.text })),
+          { role: 'user', content: chatInput }
+        ],
+        persona: selectedPersonaForChat as 'gentle' | 'no-bs',
+      };
+      const result = await coachChat(aiInput);
+      setChatMessages((msgs) => [
+        ...msgs,
+        { sender: 'coach', text: result.response }
+      ]);
+    } catch (e) {
+      setChatMessages((msgs) => [
+        ...msgs,
+        { sender: 'coach', text: 'Sorry, there was an error. Please try again.' }
+      ]);
+    } finally {
+      setIsCoachResponding(false);
+    }
+  };
 
   const handleRate = (perspective: string, rating: "up" | "down") => {
     console.log(`Rated ${perspective}: ${rating}`);
@@ -401,23 +444,101 @@ export function DualInsightsForm() {
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Perspectives
           </Button>
           {selectedPersonaForChat === "gentle" && (
-            <PerspectiveCard
-              title="Gentle Coach"
-              advice={initialAdvice.gentleCoachAdvice}
-              onRate={(rating) => handleRate("Gentle Coach", rating)}
-            />
+            <>
+              <PerspectiveCard
+                title="Gentle Coach"
+                advice={initialAdvice.gentleCoachAdvice}
+                onRate={(rating) => handleRate("Gentle Coach", rating)}
+              />
+              {/* Gentle Coach Chatbox */}
+              <div className="mt-6 bg-background/80 rounded-xl shadow-lg p-4 border border-border max-w-xl mx-auto">
+                <div className="mb-4 max-h-60 overflow-y-auto space-y-2">
+                  {chatMessages.map((msg, idx) => (
+                    <div key={idx} className={msg.sender === 'user' ? 'text-right' : 'text-left'}>
+                      <span className={
+                        msg.sender === 'user'
+                          ? 'inline-block bg-primary/10 text-primary px-3 py-2 rounded-2xl mb-1'
+                          : 'inline-block bg-accent/10 text-accent px-3 py-2 rounded-2xl mb-1'
+                      }>
+                        {msg.text}
+                      </span>
+                    </div>
+                  ))}
+                  {isCoachResponding && (
+                    <div className="text-left">
+                      <span className="inline-block bg-accent/10 text-accent px-3 py-2 rounded-2xl mb-1 animate-pulse">Gentle Coach is typing…</span>
+                    </div>
+                  )}
+                </div>
+                <form
+                  className="flex items-center gap-2"
+                  onSubmit={e => {
+                    e.preventDefault();
+                    handleSendChat();
+                  }}
+                >
+                  <Input
+                    value={chatInput}
+                    onChange={e => setChatInput(e.target.value)}
+                    placeholder="Type your message…"
+                    className="shadow-input"
+                    disabled={isCoachResponding}
+                  />
+                  <Button type="submit" disabled={!chatInput.trim() || isCoachResponding} className="bg-accent text-accent-foreground">
+                    <Send className="h-5 w-5" />
+                  </Button>
+                </form>
+              </div>
+            </>
           )}
           {selectedPersonaForChat === "no-bs" && (
-            <PerspectiveCard
-              title="No-BS Coach"
-              advice={initialAdvice.noBsCoachAdvice}
-              onRate={(rating) => handleRate("No-BS Coach", rating)}
-            />
+            <>
+              <PerspectiveCard
+                title="No-BS Coach"
+                advice={initialAdvice.noBsCoachAdvice}
+                onRate={(rating) => handleRate("No-BS Coach", rating)}
+              />
+              {/* No-BS Coach Chatbox */}
+              <div className="mt-6 bg-background/80 rounded-xl shadow-lg p-4 border border-border max-w-xl mx-auto">
+                <div className="mb-4 max-h-60 overflow-y-auto space-y-2">
+                  {chatMessages.map((msg, idx) => (
+                    <div key={idx} className={msg.sender === 'user' ? 'text-right' : 'text-left'}>
+                      <span className={
+                        msg.sender === 'user'
+                          ? 'inline-block bg-primary/10 text-primary px-3 py-2 rounded-2xl mb-1'
+                          : 'inline-block bg-accent/10 text-accent px-3 py-2 rounded-2xl mb-1'
+                      }>
+                        {msg.text}
+                      </span>
+                    </div>
+                  ))}
+                  {isCoachResponding && (
+                    <div className="text-left">
+                      <span className="inline-block bg-accent/10 text-accent px-3 py-2 rounded-2xl mb-1 animate-pulse">No-BS Coach is typing…</span>
+                    </div>
+                  )}
+                </div>
+                <form
+                  className="flex items-center gap-2"
+                  onSubmit={e => {
+                    e.preventDefault();
+                    handleSendChat();
+                  }}
+                >
+                  <Input
+                    value={chatInput}
+                    onChange={e => setChatInput(e.target.value)}
+                    placeholder="Type your message…"
+                    className="shadow-input"
+                    disabled={isCoachResponding}
+                  />
+                  <Button type="submit" disabled={!chatInput.trim() || isCoachResponding} className="bg-accent text-accent-foreground">
+                    <Send className="h-5 w-5" />
+                  </Button>
+                </form>
+              </div>
+            </>
           )}
-          {/* Placeholder for future chat input */}
-          <div className="mt-6 p-4 border-t border-border">
-            <p className="text-center text-muted-foreground">Chat with the {selectedPersonaForChat === "gentle" ? "Gentle" : "No-BS"} Coach coming soon!</p>
-          </div>
         </div>
       )}
     </div>
