@@ -10,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['"Edu NSW ACT Cursive"', 'cursive'],
-        headline: ['"Edu NSW ACT Cursive"', 'cursive'],
+        body: ['"Roboto Mono"', 'monospace'],
+        headline: ['"Roboto Mono"', 'monospace'],
         code: ['monospace'],
       },
       colors: {
