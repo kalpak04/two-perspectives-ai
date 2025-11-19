@@ -1,28 +1,19 @@
+"use client";
 
-import { DualInsightsForm } from '@/components/dual-insights-form'; 
-import { Sparkles } from 'lucide-react'; 
+import { useState } from 'react';
+import { DualInsightsForm } from '@/components/dual-insights-form';
+import { PrismBackground } from '@/components/ui/prism-background';
 
 export default function Home() {
+  const [isSynthesizing, setIsSynthesizing] = useState(false);
+
   return (
-    <main className="flex flex-col items-center justify-center flex-grow p-4 md:p-8">
-      <header className="mb-8 text-center">
-        <div className="inline-flex items-center justify-center p-3 mb-4 rounded-full bg-primary/20">
-            <Sparkles className="h-12 w-12 text-primary" strokeWidth={1.5} />
-        </div>
-        <h1 className="text-4xl md:text-6xl font-headline font-bold text-primary 
-                       tracking-wider">
-          Two Perspectives
-        </h1>
-        <p className="mt-4 text-lg text-foreground/80">
-          Explore your dilemmas with a Gentle Coach and a No-BS Coach.
-        </p>
-      </header>
-      <DualInsightsForm />
-      <footer className="mt-12 text-center text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} Two Perspectives. Powered by AI.</p>
-        <p className="mt-1">Remember: AI advice is for reflection, not a substitute for professional help.</p>
-      </footer>
+    <main className="relative flex flex-col items-center justify-center min-h-screen w-full overflow-hidden bg-background selection:bg-primary/30">
+      <PrismBackground isMerging={isSynthesizing} />
+
+      <div className="relative z-10 w-full max-w-5xl px-4 md:px-8">
+        <DualInsightsForm onSynthesizing={setIsSynthesizing} />
+      </div>
     </main>
   );
 }
-

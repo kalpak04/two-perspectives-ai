@@ -2,132 +2,106 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Removed explicit body font-family to let Tailwind config take precedence */
-
 @layer base {
   :root {
-    /* Refined Black & Red Theme (Light mode version - effectively same as dark for consistency) */
-    --background: 0 0% 4%; /* Very Dark Grey (Almost Black) */
-    --foreground: 0 0% 90%; /* Light Grey/Off-White for general text */
+    /* Immersive Prism Theme */
+    --background: #000000;
+    --foreground: #FFFFFF;
 
-    --card: 0 0% 5%; /* Very Dark Grey */
-    --card-foreground: 0 80% 50%; /* Deeper Red (for text within cards, if specific) */
+    /* Angel Perspective (Idealist) - Ethereal & Divine */
+    --angel-primary: #D8F3DC;
+    /* Soft Mint/White */
+    --angel-secondary: #E0AAFF;
+    /* Soft Lavender */
+    --angel-glow: rgba(216, 243, 220, 0.6);
+    --angel-glass: rgba(255, 255, 255, 0.15);
 
-    --popover: 0 0% 5%; /* Very Dark Grey */
-    --popover-foreground: 0 80% 50%; /* Deeper Red (for text within popovers, if specific) */
+    /* Devil Perspective (Realist) - Volcanic & Primal */
+    --devil-primary: #FF0000;
+    /* Pure Intense Red */
+    --devil-secondary: #450a0a;
+    /* Deepest Blood Red */
+    --devil-accent: #FF6B00;
+    /* Blazing Orange */
+    --devil-glow: rgba(255, 0, 0, 0.6);
+    --devil-glass: rgba(20, 0, 0, 0.7);
 
-    --primary: 0 80% 55%; /* Brighter Red for primary actions/titles/headings */
-    --primary-foreground: 0 0% 98%; /* Off-White (for text on red buttons) */
-
-    --secondary: 0 0% 20%; /* Dark Grey */
-    --secondary-foreground: 0 0% 90%; /* Light Grey/Off-White */
-
-    --muted: 0 0% 10%; /* Darker Grey */
-    --muted-foreground: 0 0% 60%; /* Medium Grey (for placeholder text, etc.) */
-
-    --accent: 0 80% 55%; /* Brighter Red (same as primary) */
-    --accent-foreground: 0 0% 98%; /* Off-White */
-
-    --destructive: 0 0% 50%; /* Medium Grey (for destructive actions, to contrast red text) */
-    --destructive-foreground: 0 0% 98%; /* Off-White */
-
-    --border: 0 0% 15%; /* Dark Grey Border */
-    --input: 0 0% 7%; /* Very Dark Grey Input Background */
-    --ring: 0 80% 60%; /* Brightest Red Ring for focus */
-    
-    --chart-1: 0 80% 60%;
-    --chart-2: 0 80% 55%;
-    --chart-3: 0 80% 50%;
-    --chart-4: 0 0% 50%;
-    --chart-5: 0 0% 30%;
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 3%; 
-    --sidebar-foreground: 0 80% 55%; 
-    --sidebar-primary: 0 80% 50%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 80% 50%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 12%;
-    --sidebar-ring: 0 80% 60%;
-
-    --interactive-bg-spotlight: hsla(0, 0%, 60%, 0.25); /* Greyish spotlight for black bg, increased visibility */
-  }
-
-  .dark {
-    /* Refined Black & Red Theme (Dark mode version - mirrors light for consistency) */
-    --background: 0 0% 4%; /* Very Dark Grey (Almost Black) */
-    --foreground: 0 0% 90%; /* Light Grey/Off-White for general text */
-
-    --card: 0 0% 5%; /* Very Dark Grey */
-    --card-foreground: 0 80% 50%; /* Deeper Red */
-
-    --popover: 0 0% 5%; /* Very Dark Grey */
-    --popover-foreground: 0 80% 50%; /* Deeper Red */
-
-    --primary: 0 80% 55%; /* Brighter Red for primary actions/titles/headings */
-    --primary-foreground: 0 0% 98%; /* Off-White */
-
-    --secondary: 0 0% 20%; /* Dark Grey */
-    --secondary-foreground: 0 0% 90%; /* Light Grey/Off-White */
-
-    --muted: 0 0% 10%; /* Darker Grey */
-    --muted-foreground: 0 0% 60%; /* Medium Grey */
-
-    --accent: 0 80% 55%; /* Brighter Red (same as primary) */
-    --accent-foreground: 0 0% 98%; /* Off-White */
-
-    --destructive: 0 0% 50%; /* Medium Grey */
-    --destructive-foreground: 0 0% 98%; /* Off-White */
-
-    --border: 0 0% 15%; /* Dark Grey Border */
-    --input: 0 0% 7%; /* Very Dark Grey Input Background */
-    --ring: 0 80% 60%; /* Brightest Red Ring */
-    
-    --chart-1: 0 80% 60%;
-    --chart-2: 0 80% 55%;
-    --chart-3: 0 80% 50%;
-    --chart-4: 0 0% 50%;
-    --chart-5: 0 0% 30%;
-
-    --sidebar-background: 0 0% 3%;
-    --sidebar-foreground: 0 80% 55%;
-    --sidebar-primary: 0 80% 50%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 80% 50%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 12%;
-    --sidebar-ring: 0 80% 60%;
-
-    --interactive-bg-spotlight: hsla(0, 0%, 60%, 0.25); /* Greyish spotlight for black bg, increased visibility */
+    --card: #000000;
+    --card-foreground: #FFFFFF;
+    --popover: #000000;
+    --popover-foreground: #FFFFFF;
+    --primary: #FFFFFF;
+    --primary-foreground: #000000;
+    --secondary: #1C1C1E;
+    --secondary-foreground: #FFFFFF;
+    --muted: #1C1C1E;
+    --muted-foreground: #A1A1AA;
+    --accent: #FFFFFF;
+    --accent-foreground: #000000;
+    --destructive: #7F1D1D;
+    --destructive-foreground: #FFFFFF;
+    --border: #27272A;
+    --input: #27272A;
+    --ring: #FFFFFF;
+    --radius: 1rem;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--border);
   }
+
   body {
-    @apply bg-background text-foreground; /* Default text color is now --foreground */
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll from effects */
   }
 }
 
-/* Glowing input for chatbox, red for contrast */
-.shadow-input {
-  box-shadow: 0 0 0 0 rgba(255, 64, 129, 0);
-  transition: box-shadow 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-.shadow-input:hover {
-  box-shadow: 0 0 0 2px rgba(255, 64, 129, 0.3);
-}
-.shadow-input:focus, .shadow-input:focus-visible {
-  box-shadow: 0 0 0 4px rgba(255, 64, 129, 0.5);
-}
+@layer utilities {
+  .apple-glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
 
-@keyframes fadein {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-fadein {
-  animation: fadein 0.4s cubic-bezier(0.4,0,0.2,1);
+  .angel-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(30px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 40px var(--angel-glow), inset 0 0 20px rgba(255, 255, 255, 0.2);
+  }
+
+  .devil-glass {
+    background: rgba(20, 0, 0, 0.6);
+    backdrop-filter: blur(30px) saturate(150%);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    box-shadow: 0 0 40px var(--devil-glow), inset 0 0 20px rgba(239, 68, 68, 0.1);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Custom Animations */
+  @keyframes aurora {
+    0% {
+      background-position: 50% 50%, 50% 50%;
+    }
+
+    100% {
+      background-position: 350% 50%, 350% 50%;
+    }
+  }
+
+  .animate-aurora {
+    animation: aurora 60s linear infinite;
+  }
 }
